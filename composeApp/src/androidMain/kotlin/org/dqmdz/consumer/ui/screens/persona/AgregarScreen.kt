@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,20 +21,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import client.addPersona
-import kotlinx.coroutines.launch
+import org.dqmdz.consumer.viewModel.PersonaViewModel
 import kotlinx.datetime.LocalDate
 import model.Persona
 import java.util.Calendar
 
 @Composable
 fun AgregarScreen(
-    onPersonaAgregada: () -> Unit // Llamar a esta función para volver a la lista después de agregar
+    personaViewModel: PersonaViewModel, // Usamos el ViewModel aquí
+    onPersonaAgregada: () -> Unit // Navegar después de agregar
 ) {
     var nombre by remember { mutableStateOf(TextFieldValue("")) }
     var apellido by remember { mutableStateOf(TextFieldValue("")) }
     var fechaNacimiento by remember { mutableStateOf<LocalDate?>(null) }
-    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
 
     Scaffold(
@@ -92,15 +90,13 @@ fun AgregarScreen(
                 Button(
                     onClick = {
                         if (nombre.text.isNotEmpty() && apellido.text.isNotEmpty() && fechaNacimiento != null) {
-                            coroutineScope.launch {
-                                val nuevaPersona = addPersona(
-                                    Persona(
-                                        id = null, // El backend asigna el ID
-                                        nombre = nombre.text,
-                                        apellido = apellido.text,
-                                        fechaNacimiento = fechaNacimiento!!
-                                    )
-                                )
+                            val nuevaPersona = Persona(
+                                id = null,
+                                nombre = nombre.text,
+                                apellido = apellido.text,
+                                fechaNacimiento = fechaNacimiento!!
+                            )
+                            personaViewModel.addPersona(nuevaPersona) {
                                 onPersonaAgregada() // Volver a la pantalla de listar
                             }
                         }

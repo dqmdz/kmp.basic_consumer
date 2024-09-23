@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -27,7 +28,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val personaViewModel = PersonaViewModel()
+            val personaViewModel: PersonaViewModel = viewModel()
             MainScreen(personaViewModel)
         }
     }
@@ -58,14 +59,16 @@ fun MainScreen(personaViewModel: PersonaViewModel) {
         NavHost(
             navController = navController,
             startDestination = "home",
-            modifier = Modifier.padding(contentPadding) // Asegurarnos de usar el padding
+            modifier = Modifier.padding(contentPadding)
         ) {
             composable("home") {
                 HomeScreen()
             }
             composable("persona") {
                 showPersonaBottomBar = true
+                personaViewModel.loadPersonas() // Asegurar que las personas se carguen al entrar
                 ListarScreen(
+                    personaViewModel = personaViewModel,
                     onNavigateToAgregar = {
                         navController.navigate("agregar")
                     }
@@ -76,19 +79,12 @@ fun MainScreen(personaViewModel: PersonaViewModel) {
             }
             composable("agregar") {
                 AgregarScreen(
+                    personaViewModel = personaViewModel,
                     onPersonaAgregada = {
-                        // Navegar de vuelta a la lista después de agregar la persona
+                        // Volver a la pantalla de listar personas y actualizar la lista
                         navController.navigate("persona") {
                             popUpTo("persona") { inclusive = true }
                         }
-                    }
-                )
-            }
-            composable("listar") {
-                showPersonaBottomBar = true // Aseguramos que la BottomBar de Persona esté visible
-                ListarScreen(
-                    onNavigateToAgregar = {
-                        navController.navigate("agregar")
                     }
                 )
             }
