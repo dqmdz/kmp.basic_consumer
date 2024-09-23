@@ -24,7 +24,12 @@ fun BottomBarPersona(navController: NavController, onBackToHome: () -> Unit) {
             icon = { Icon(Icons.Filled.List, contentDescription = "Listar") },
             label = { Text("Listar") },
             selected = false,
-            onClick = { navController.navigate("listar") }
+            onClick = {
+                // Volver a la pantalla de personas para listar
+                navController.navigate("persona") {
+                    popUpTo("persona") { inclusive = true }
+                }
+            }
         )
         BottomNavigationItem(
             icon = { Icon(Icons.Filled.ArrowBack, contentDescription = "Volver") },

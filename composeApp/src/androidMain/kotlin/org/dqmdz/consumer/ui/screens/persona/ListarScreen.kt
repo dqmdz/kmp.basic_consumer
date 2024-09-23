@@ -14,42 +14,20 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import client.deletePersona
-import client.getPersonaData
-import kotlinx.coroutines.launch
-import model.Persona
+import org.dqmdz.consumer.viewModel.PersonaViewModel
 
 @Composable
 fun ListarScreen(
-    onNavigateToAgregar: () -> Unit // Parámetro de navegación para agregar, pero sin botón extra
+    personaViewModel: PersonaViewModel, // Se inyecta el ViewModel
+    onNavigateToAgregar: () -> Unit // Parámetro de navegación para agregar
 ) {
-    var personas by remember { mutableStateOf<List<Persona>>(emptyList()) }
-    val coroutineScope = rememberCoroutineScope()
-
-    // Cargar los datos desde la API
+    // Cargar los datos cuando la pantalla se inicializa
     LaunchedEffect(Unit) {
-        coroutineScope.launch {
-            val apiResponse = getPersonaData()
-            personas = apiResponse
-        }
-    }
-
-    // Función para eliminar una persona y refrescar la lista
-    fun eliminarPersona(persona: Persona) {
-        coroutineScope.launch {
-            deletePersona(persona.id) // Eliminar la persona usando el backend
-            // Refrescar la lista de personas después de la eliminación
-            personas = getPersonaData()
-        }
+        personaViewModel.loadPersonas()
     }
 
     Scaffold(
@@ -76,8 +54,13 @@ fun ListarScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(personas) { persona ->
-                    PersonaCard(persona, onDelete = { eliminarPersona(it) })
+                items(personaViewModel.personas) { persona ->
+                    PersonaCard(persona, onDelete = {
+                        personaViewModel.deletePersona(persona.id) {
+                            // Refrescar lista después de eliminar
+                            personaViewModel.loadPersonas()
+                        }
+                    })
                 }
             }
         }
