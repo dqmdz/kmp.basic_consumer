@@ -13,15 +13,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import org.dqmdz.consumer.ui.BottomBar
 import org.dqmdz.consumer.ui.BottomBarPersona
 import org.dqmdz.consumer.ui.screens.AboutScreen
 import org.dqmdz.consumer.ui.screens.HomeScreen
 import org.dqmdz.consumer.ui.screens.persona.AgregarScreen
 import org.dqmdz.consumer.ui.screens.persona.ListarScreen
+import org.dqmdz.consumer.ui.screens.persona.ModificarScreen
 import org.dqmdz.consumer.viewModel.PersonaViewModel
 
 class MainActivity : ComponentActivity() {
@@ -66,11 +69,14 @@ fun MainScreen(personaViewModel: PersonaViewModel) {
             }
             composable("persona") {
                 showPersonaBottomBar = true
-                personaViewModel.loadPersonas() // Asegurar que las personas se carguen al entrar
+                personaViewModel.loadPersonas()
                 ListarScreen(
                     personaViewModel = personaViewModel,
                     onNavigateToAgregar = {
                         navController.navigate("agregar")
+                    },
+                    onNavigateToModificar = { personaId ->
+                        navController.navigate("modificar/$personaId")
                     }
                 )
             }
@@ -81,7 +87,21 @@ fun MainScreen(personaViewModel: PersonaViewModel) {
                 AgregarScreen(
                     personaViewModel = personaViewModel,
                     onPersonaAgregada = {
-                        // Volver a la pantalla de listar personas y actualizar la lista
+                        navController.navigate("persona") {
+                            popUpTo("persona") { inclusive = true }
+                        }
+                    }
+                )
+            }
+            composable(
+                "modificar/{personaId}",
+                arguments = listOf(navArgument("personaId") { type = NavType.IntType })
+            ) { backStackEntry ->
+                val personaId = backStackEntry.arguments?.getInt("personaId") ?: 0
+                ModificarScreen(
+                    personaId = personaId,
+                    personaViewModel = personaViewModel,
+                    onPersonaModificada = {
                         navController.navigate("persona") {
                             popUpTo("persona") { inclusive = true }
                         }

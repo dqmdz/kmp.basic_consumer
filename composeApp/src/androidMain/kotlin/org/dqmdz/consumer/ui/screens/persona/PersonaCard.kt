@@ -27,7 +27,11 @@ import androidx.compose.ui.unit.sp
 import model.Persona
 
 @Composable
-fun PersonaCard(persona: Persona, onDelete: (Persona) -> Unit) {
+fun PersonaCard(
+    persona: Persona,
+    onDelete: (Persona) -> Unit,
+    onEdit: (Int) -> Unit // Nueva función para manejar la edición
+) {
     var showDialog by remember { mutableStateOf(false) }
 
     // Mostrar el diálogo de confirmación
@@ -35,11 +39,11 @@ fun PersonaCard(persona: Persona, onDelete: (Persona) -> Unit) {
         EliminarPersonaDialog(
             personaNombre = "${persona.nombre} ${persona.apellido}",
             onConfirm = {
-                showDialog = false // Cerrar el diálogo
-                onDelete(persona) // Llamar a la función de eliminación
+                showDialog = false
+                onDelete(persona)
             },
             onDismiss = {
-                showDialog = false // Cerrar el diálogo sin eliminar
+                showDialog = false
             }
         )
     }
@@ -65,10 +69,10 @@ fun PersonaCard(persona: Persona, onDelete: (Persona) -> Unit) {
             Text(text = "Fecha de Nacimiento: ${persona.fechaNacimiento}", fontSize = 14.sp, color = Color.Gray)
 
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                IconButton(onClick = { showDialog = true }) { // Mostrar el diálogo al eliminar
+                IconButton(onClick = { showDialog = true }) {
                     Icon(imageVector = Icons.Filled.Delete, contentDescription = "Eliminar", tint = Color.Red)
                 }
-                IconButton(onClick = {  }) { // Navegar a la pantalla de edición
+                IconButton(onClick = { onEdit(persona.id!!) }) { // Navegar a la pantalla de edición
                     Icon(imageVector = Icons.Filled.Edit, contentDescription = "Editar", tint = Color.Blue)
                 }
             }
