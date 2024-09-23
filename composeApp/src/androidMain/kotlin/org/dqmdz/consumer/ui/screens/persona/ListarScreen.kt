@@ -22,8 +22,9 @@ import org.dqmdz.consumer.viewModel.PersonaViewModel
 
 @Composable
 fun ListarScreen(
-    personaViewModel: PersonaViewModel, // Se inyecta el ViewModel
-    onNavigateToAgregar: () -> Unit // Parámetro de navegación para agregar
+    personaViewModel: PersonaViewModel,
+    onNavigateToAgregar: () -> Unit,
+    onNavigateToModificar: (Int) -> Unit // Navegación a la pantalla de modificación
 ) {
     // Cargar los datos cuando la pantalla se inicializa
     LaunchedEffect(Unit) {
@@ -55,12 +56,17 @@ fun ListarScreen(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 items(personaViewModel.personas) { persona ->
-                    PersonaCard(persona, onDelete = {
-                        personaViewModel.deletePersona(persona.id) {
-                            // Refrescar lista después de eliminar
-                            personaViewModel.loadPersonas()
+                    PersonaCard(
+                        persona = persona,
+                        onDelete = {
+                            personaViewModel.deletePersona(persona.id) {
+                                personaViewModel.loadPersonas()
+                            }
+                        },
+                        onEdit = { personaId ->
+                            onNavigateToModificar(personaId) // Navegar a modificar
                         }
-                    })
+                    )
                 }
             }
         }
