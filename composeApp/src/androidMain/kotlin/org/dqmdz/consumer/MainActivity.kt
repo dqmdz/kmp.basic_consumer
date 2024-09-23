@@ -65,16 +65,32 @@ fun MainScreen(personaViewModel: PersonaViewModel) {
             }
             composable("persona") {
                 showPersonaBottomBar = true
-                ListarScreen() // Directamente muestra la pantalla de Listar al seleccionar Persona
+                ListarScreen(
+                    onNavigateToAgregar = {
+                        navController.navigate("agregar")
+                    }
+                )
             }
             composable("about") {
                 AboutScreen()
             }
             composable("agregar") {
-                AgregarScreen()
+                AgregarScreen(
+                    onPersonaAgregada = {
+                        // Navegar de vuelta a la lista después de agregar la persona
+                        navController.navigate("persona") {
+                            popUpTo("persona") { inclusive = true }
+                        }
+                    }
+                )
             }
             composable("listar") {
-                ListarScreen()
+                showPersonaBottomBar = true // Aseguramos que la BottomBar de Persona esté visible
+                ListarScreen(
+                    onNavigateToAgregar = {
+                        navController.navigate("agregar")
+                    }
+                )
             }
         }
     }

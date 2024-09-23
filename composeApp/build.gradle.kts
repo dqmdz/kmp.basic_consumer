@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
+    alias(libs.plugins.kotlinxSerialization)
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsCompose)
     alias(libs.plugins.compose.compiler)
@@ -34,6 +35,13 @@ kotlin {
             implementation(libs.androidx.material.icons.core) // Íconos básicos
             implementation(libs.androidx.material.icons.extended) // Íconos extendidos
             implementation(libs.kotlinx.datetime) // Asegúrate de usar la última versión
+            implementation(libs.ktor.client.core) // Ktor core
+            implementation(libs.ktor.client.cio) // Ktor client for Android/Multiplatform
+            implementation(libs.ktor.client.json) // Ktor JSON serialization
+            implementation(libs.ktor.client.logging) // Logging for HTTP requests
+            implementation(libs.ktor.client.content.negotiation) // Content negotiation
+            implementation(libs.ktor.serialization.kotlinx.json) // Kotlinx JSON serialization
+            implementation(libs.kotlinx.datetime)
 
         }
     }
@@ -80,3 +88,6 @@ android {
     }
 }
 
+dependencies {
+    implementation(kotlin("script-runtime"))
+}
